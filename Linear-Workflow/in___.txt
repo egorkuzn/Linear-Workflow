@@ -1,0 +1,8 @@
+readfile 1;
+readfile 2;
+readfile 3;
+writefile 1;
+writefile 2;
+writefile 3; // несколько replace
+sort;
+1->7->4->2->7->5
