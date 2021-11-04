@@ -3,15 +3,14 @@
 namespace wkfw{
 	Workflow::Workflow(const std::string& ifname, std::string ofname): 
 	ifname(ifname),
-    ofname(ofname) {
+    ofname(ofname),
+	parser(ifname){
 		if (ofname == "") {
 			std::cout << "No output file set. Redirecting the stream in \"out.txt\"" << std::endl;
 			ofname = "out.txt";
 		}
 		if(ifname != ""){
-			WorkflowParser filenameParser(ifname);
-			if(filenameParser.isInputValid){
-				parser = filenameParser;
+			if(parser.isInputValid){
 				buildDescription();
 			}
 			else 
@@ -99,19 +98,24 @@ namespace wkfw{
 			do {
 				lastResult = worker->execute(lastResult);
 			}
-			while((worker = nextInstruction()));
+			while(lastResult.getType() && (worker = nextInstruction() ) );
 
-			if (lastResult.getType() != WorkerResult::NONE) {
+			if (lastResult.getType() == WorkerResult::NONE)
+				return;
+
+			if (lastResult.getType() != WorkerResult::UNKNOWN) {
 				workers::WriteFile writer(0, ofname);
-				writer.execute(lastResult);
+				writer.execute(lastResult);		
+				return;
 			}
-		}
-		else{
-			std::ofstream output;
-			output.open(ofname.c_str());
-			output << parser.exception << "Error: Empty workflow";
-			output.close();
-		}
+
+		}		
+		isEmpty = true;
+		std::ofstream output;
+		output.open(ofname.c_str(), std::ios::in | std::ios::app);
+		output << parser.exception << "Error: Empty workflow";
+		output.close();
+		
 	}
 
 	

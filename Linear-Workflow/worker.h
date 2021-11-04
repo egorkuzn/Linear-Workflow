@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <exception>
 #include <string>
 #include <vector>
@@ -8,15 +9,31 @@ namespace wkfw {
 
 	class NoResultException : public std::exception {
 	public:
+		NoResultException() { save(); }
+
 		const char* what() const throw() override { return "No result given!"; }
+
+		void save() {
+			std::ofstream output;
+			output.open("out.txt", std::ios::in | std::ios::app);
+			output << "NoResultException: No result given!" << std::endl;
+			output.close();
+		}
 	};
 
 	class WorkerExecuteException : public std::exception {
  	public:
-  		WorkerExecuteException(const std::string& description)
-      	: description(description) {}
+		WorkerExecuteException(const std::string& description)
+			: description(description) { save(); }
 
- 	 	const char* what() const throw() override { return description.c_str(); }
+		const char* what() const throw() override { return description.c_str(); }
+
+		void save(){
+			std::ofstream output;
+			output.open("out.txt", std::ios::in | std::ios::app);
+			output << description << std::endl;
+			output.close();
+		}
 
  	private:
  	 	const std::string description;
@@ -26,6 +43,8 @@ namespace wkfw {
 	public:
 		enum ResultType { UNKNOWN, NONE, TEXT };
 		WorkerResult() : type(NONE) {}
+
+		WorkerResult(ResultType type) : type(type) {}
 
 		WorkerResult(const std::vector<std::string>& value) : type(TEXT), value(value) {}
 
@@ -48,9 +67,15 @@ namespace wkfw {
 		const ResultType getType() const { return type; }
 
 		const std::vector<std::string> getValue() const {
-			if (type == NONE)
-				throw NoResultException();
-			return value;
+			try {
+				if (type == NONE)
+					throw NoResultException();
+				return value;
+			}
+			catch (NoResultException obj) {
+				std::vector<std::string> _null_str_vect;
+				return _null_str_vect;
+			}
 		}
 	private:
 		ResultType type;
@@ -73,6 +98,16 @@ namespace wkfw {
 		WorkerResult::ResultType getReturnType() const { return returnType; }
 
 		WorkerResult::ResultType getAcceptType() const { return acceptType; }
+
+		int isValidAcceptedResult(const WorkerResult& result) const{
+			if (result.getType() == acceptType)
+				return 1;
+			else {
+				WorkerExecuteException exeption("Isn't valid accepted type of\
+																previous result");
+				return 0;
+			}
+		}
 
 		virtual ~Worker() {}
 

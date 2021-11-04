@@ -9,6 +9,7 @@ namespace wkfw{
             isInputValid = other.isInputValid;
             instruction = other.instruction;
             blocks = other.blocks;
+            exception = other.exception;
         }
 
         int WorkflowParser::deleteWhiteSpaces(std::string& line) {
@@ -35,15 +36,14 @@ namespace wkfw{
         }
 
         int WorkflowParser::addElemInstruction(uint32_t& count, bool& isLastCount) {
-            if (count < blocksRange.capacity() && blocksRange[count]) {
+            if (count < blocksRange.size() && blocksRange[count]) {
                 instruction.push_back(count);
-                count = 0;
-                isLastCount = false;
-            }
-            else {
-                WorkflowParserException("bad id of instruction");
-                return 0;
-            }
+                count = 0;        
+                isLastCount = false;        
+                return 1;        
+            }               
+            WorkflowParserException("bad id of instruction");
+            return 0;            
         }
 
         int WorkflowParser::getInstruction(std::string& line) {

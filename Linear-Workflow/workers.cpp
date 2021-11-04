@@ -41,6 +41,9 @@ namespace workers {
 
     input.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
+    if (previous.getType() != WorkerResult::NONE)
+        list = previous.getValue();
+
     try {
       input.open(filename);
       std::string line;
@@ -58,34 +61,43 @@ namespace workers {
   }
 
   const WorkerResult WriteFile::execute(const WorkerResult& previous) const {
+    if (!isValidAcceptedResult(previous))
+      return WorkerResult(WorkerResult::UNKNOWN);
+
     std::ofstream output;
 
-    output.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+    output.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
     try {
-      output.open(filename);
+      output.open(filename, std::ios::in | std::ios::app);    
       for (auto const& line : previous.getValue())
         output << line << std::endl;
       output.close();
     } catch (std::ofstream::failure& e) {
-      throw wkfw::WorkerExecuteException("Cannot write lines to file \"" +
+      throw WorkerExecuteException("Cannot write lines to file \"" +
                                        filename + "\"");
-    }
-
+      return WorkerResult(WorkerResult::UNKNOWN);
+    } 
     return WorkerResult();
   }
 
   const WorkerResult Grep::execute(const WorkerResult& previous) const {
+    if (!isValidAcceptedResult(previous))
+      return WorkerResult(WorkerResult::UNKNOWN);
+
     std::vector<std::string> list;
 
     for (auto const& line : previous.getValue())
-      if (line.find_first_of(pattern))
+      if (line.find(pattern))
         list.push_back(line);
 
     return WorkerResult(list);
   }
 
   const WorkerResult Sort::execute(const WorkerResult& previous) const {
+    if (!isValidAcceptedResult(previous))
+      return WorkerResult(WorkerResult::UNKNOWN);
+
     std::vector<std::string> list = previous.getValue();
 
     std::sort(list.begin(), list.end());
@@ -109,6 +121,9 @@ namespace workers {
   }
 
   const WorkerResult Replace::execute(const WorkerResult& previous) const {
+    if (!isValidAcceptedResult(previous))
+      return WorkerResult(WorkerResult::UNKNOWN);
+
     std::vector<std::string> list;
 
     for (auto const& line : previous.getValue())
@@ -118,6 +133,9 @@ namespace workers {
   }
 
   const WorkerResult Dump::execute(const WorkerResult& previous) const {
+    if (!isValidAcceptedResult(previous))
+      return WorkerResult(WorkerResult::UNKNOWN);
+
     WriteFile::execute(previous);
 
     return WorkerResult(previous.getValue());

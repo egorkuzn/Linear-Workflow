@@ -8,11 +8,9 @@ int main(){
     const std::string o = "out.txt";
     Workflow wflow(i, o);
     wflow.run();
-    if(wflow){
-        std::cout<< "Workes" << std::endl;
-    }
-    else{
-        std::cout << "No workes" << std::endl;
-    }
+    if(wflow)
+        std::cout<< "Workes" << std::endl;    
+    else
+        std::cout << "No workes" << std::endl;    
     return 0;
 }

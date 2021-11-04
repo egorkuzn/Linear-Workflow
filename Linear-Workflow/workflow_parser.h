@@ -18,6 +18,7 @@ namespace wkfw{
                 instruction = other.instruction;
                 blocks = other.blocks;
                 isInputValid = other.isInputValid;
+                exception = other.exception;
             }
             std::string exception;
             std::list<uint32_t> instruction;
