@@ -19,7 +19,7 @@ namespace wkfw{
                 blocks = other.blocks;
                 isInputValid = other.isInputValid;
             }
-
+            std::string exception;
             std::list<uint32_t> instruction;
             std::vector<std::string> blocks; 
             bool isInputValid = true;
@@ -27,11 +27,12 @@ namespace wkfw{
             int getInstruction(std::string& line);
             std::vector<bool> blocksRange;
             void WorkflowParserException(std::string msg) {
-                std::cout << "Workflow exception: " << msg << std::endl;
+                isInputValid = false;
+                exception += "WorkflowParser exception: " + msg + "\n";
             }
             int getBlock(std::string& line);
             void getFromFile(const std::string& filename);
             int deleteWhiteSpaces(std::string& line);
-            int addElemInstruction(uint32_t& count, bool isLastCount);
+            int addElemInstruction(uint32_t& count, bool& isLastCount);
     };
 }

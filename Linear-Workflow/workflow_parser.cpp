@@ -34,7 +34,7 @@ namespace wkfw{
             line = lineWithoutSpaces;
         }
 
-        int WorkflowParser::addElemInstruction(uint32_t& count, bool isLastCount) {
+        int WorkflowParser::addElemInstruction(uint32_t& count, bool& isLastCount) {
             if (count < blocksRange.capacity() && blocksRange[count]) {
                 instruction.push_back(count);
                 count = 0;
@@ -56,10 +56,10 @@ namespace wkfw{
             for (size_t i = 0; i < line.length(); ++i) {
                 if (('0' <= line[i] && line[i] <= '9')
                     || ((i > 0) && line[i - 1] == '-'
-                                && line[i] == '>')
-                    || (((i + 1)< line.length())
+                        && line[i] == '>')
+                    || (((i + 1) < line.length())
                         && line[i] == '-'
-                        && line[i + 1] == '>') ) {
+                        && line[i + 1] == '>')) {
                     if (line[i] == '>' && isLastCount) {
                         if (!addElemInstruction(count, isLastCount))
                             return 0;
@@ -67,22 +67,18 @@ namespace wkfw{
                     else if (line[i] != '-') {
                         isLastCount = true;
                         count *= 10;
-                        count += line[i] - '0';                   
+                        count += line[i] - '0';
                     }
                 }
-                else {
-                    instruction.clear();
+                else
                     return 0;
-                }
             }
 
             if (isLastCount && addElemInstruction(count, isLastCount)) {
                 return 1;
             }
-            else {
-                instruction.clear();
-                return 0;
-            }
+            else 
+                return 0;            
         }
 
     int WorkflowParser::getBlock(std::string& line) {
@@ -104,7 +100,7 @@ namespace wkfw{
             blocks[id] = sub_cmd;
             return 1;
         }
-        else
+        else 
             return 0;
     }
 
@@ -144,18 +140,12 @@ namespace wkfw{
             input.close();
         } catch(std::istream::failure& e){
             WorkflowParserException("Problem with reading and opening \"" + filename + "\"");
-            blocks.clear();
-            isInputValid = false;
             input.close();
         } catch(const char* msg){
             WorkflowParserException(msg);
-            blocks.clear();
-            isInputValid = false;
             input.close();
         } catch(const std::invalid_argument& ia){
             WorkflowParserException("Invalid argument");
-            blocks.clear();
-            isInputValid = false;
             input.close();
         }
 

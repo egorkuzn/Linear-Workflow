@@ -1,5 +1,0 @@
-desc
-1 = readfile text.txt
-3 = writefile out.txt
-cdes
-1 -> 3

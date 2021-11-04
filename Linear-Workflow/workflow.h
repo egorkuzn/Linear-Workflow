@@ -13,7 +13,7 @@
 namespace wkfw{
     class Workflow{
      public:
-        Workflow(const std::string& ifname, const std::string& ofname);
+        Workflow(const std::string& ifname, std::string ofname);
 
         Workflow(const Workflow& other);
 
