@@ -32,6 +32,6 @@ namespace wkfw{
             int getBlock(std::string& line);
             void getFromFile(const std::string& filename);
             int deleteWhiteSpaces(std::string& line);
-            int addElemInstruction(uint32_t count, bool isLastCount);
+            int addElemInstruction(uint32_t& count, bool isLastCount);
     };
 }

@@ -34,7 +34,7 @@ namespace wkfw{
             line = lineWithoutSpaces;
         }
 
-        int WorkflowParser::addElemInstruction(uint32_t count, bool isLastCount) {
+        int WorkflowParser::addElemInstruction(uint32_t& count, bool isLastCount) {
             if (count < blocksRange.capacity() && blocksRange[count]) {
                 instruction.push_back(count);
                 count = 0;
