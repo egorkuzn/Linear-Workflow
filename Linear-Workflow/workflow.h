@@ -29,7 +29,7 @@ namespace wkfw{
         std::string ofname;
     private:        
         std::map<uint32_t, const Worker*> description;
-        WorkflowParcer parser;
+        WorkflowParser parser;
         bool isEmpty = false; 
         const Worker* getWorkerById(uint32_t id);
         const std::string extractCmd(std::string cmd_line);

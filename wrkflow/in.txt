@@ -1,7 +1,5 @@
 desc
-1 = readfile in.txt
-2 = writefile out.txt
-3 = sort
-10 = replace word1 word2
-csed
-1->3->10->3->2
+1 = readfile text.txt
+3 = writefile out.txt
+cdes
+1 -> 2  -> 3

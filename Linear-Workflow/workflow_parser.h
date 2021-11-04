@@ -7,14 +7,14 @@
 #include <iostream>
 
 namespace wkfw{
-    class WorkflowParcer{
+    class WorkflowParser{
         public:
-            WorkflowParcer(const std::string& filename);
-            WorkflowParcer(){}
+            WorkflowParser(const std::string& filename);
+            WorkflowParser(){}
 
-            void operator=(WorkflowParcer other);
+            void operator=(WorkflowParser other);
 
-            WorkflowParcer(const WorkflowParcer& other){
+            WorkflowParser(const WorkflowParser& other){
                 instruction = other.instruction;
                 blocks = other.blocks;
                 isInputValid = other.isInputValid;
@@ -25,10 +25,13 @@ namespace wkfw{
             bool isInputValid = true;
         private:
             int getInstruction(std::string& line);
-            void WorkflowException(std::string msg) {
+            std::vector<bool> blocksRange;
+            void WorkflowParserException(std::string msg) {
                 std::cout << "Workflow exception: " << msg << std::endl;
             }
             int getBlock(std::string& line);
             void getFromFile(const std::string& filename);
+            int deleteWhiteSpaces(std::string& line);
+            int addElemInstruction(uint32_t count, bool isLastCount);
     };
 }

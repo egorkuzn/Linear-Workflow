@@ -5,7 +5,7 @@ namespace wkfw{
 	ifname(ifname),
     ofname(ofname) {
 		if(ifname != ""){
-			WorkflowParcer filenameParser(ifname);
+			WorkflowParser filenameParser(ifname);
 			if(filenameParser.isInputValid){
 				parser = filenameParser;
 				buildDescription();
@@ -21,7 +21,7 @@ namespace wkfw{
 		ifname = other.ifname;
 		ofname = other.ofname;
 		if(other){
-			WorkflowParcer filenameParser(ifname);
+			WorkflowParser filenameParser(ifname);
 			parser = filenameParser;
 			buildDescription();
 		}
@@ -36,7 +36,8 @@ namespace wkfw{
 	const Worker* worker = (!parser.instruction.empty()
 			 ? getWorkerById(parser.instruction.front())               
 			 : nullptr);
-	parser.instruction.pop_front();
+	if(parser.instruction.size())
+		parser.instruction.pop_front();
 	return worker;
 	}
 
@@ -91,8 +92,9 @@ namespace wkfw{
 				lastResult = reader.execute(lastResult);
 			}
 
-			do
+			do {
 				lastResult = worker->execute(lastResult);
+			}
 			while((worker = nextInstruction()));
 
 			if (lastResult.getType() != WorkerResult::NONE) {

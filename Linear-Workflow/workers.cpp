@@ -79,7 +79,7 @@ namespace workers {
     std::vector<std::string> list;
 
     for (auto const& line : previous.getValue())
-      if (line.find(pattern))
+      if (line.find_first_of(pattern))
         list.push_back(line);
 
     return WorkerResult(list);
