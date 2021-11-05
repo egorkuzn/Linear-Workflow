@@ -1,2 +1,0 @@
-WorkflowParser exception: csed not found
-Error: Empty workflow

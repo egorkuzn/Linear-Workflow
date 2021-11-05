@@ -35,5 +35,8 @@ namespace wkfw{
             void getFromFile(const std::string& filename);
             int deleteWhiteSpaces(std::string& line);
             int addElemInstruction(uint32_t& count, bool& isLastCount);
+            void dataOptimize(void);
+            void deleteTwins(void);
+            void deleteNoUsedBlocks();
     };
 }

@@ -82,13 +82,21 @@ namespace wkfw{
         }
 
     int WorkflowParser::getBlock(std::string& line) {
-        if (!line.length())
+        if (!line.length()) {
+            WorkflowParserException("Empty block line");
             return 0;
+        }
         if (line.find(" ")) {
             size_t pointer = line.find(" ");
             std::string sub_id = line.substr(0, pointer);
             pointer += 3;
             std::string sub_cmd = line.substr(pointer, line.length() - pointer);
+
+            if (sub_id[0] == '-') {
+                WorkflowParserException("Negative id");
+                return 0;
+            }
+
             uint32_t id = std::stoul(sub_id);
 
             if (blocks.capacity() < id + 1) {
@@ -100,8 +108,70 @@ namespace wkfw{
             blocks[id] = sub_cmd;
             return 1;
         }
-        else 
+        else {
+            WorkflowParserException("No _split_ detected");
             return 0;
+        }
+    }
+
+    void WorkflowParser::dataOptimize(void) {
+        uint32_t i = 0;
+        std::list<uint32_t> new_instruction;
+        do {
+            if (blocksRange[i]) {
+                continue;
+            }
+            else {
+                uint32_t iPrevios = i;
+
+                while (!blocksRange[iPrevios] && iPrevios < blocksRange.size())
+                    ++iPrevios;
+
+                blocksRange.erase(blocksRange.begin() + i, blocksRange.begin() + iPrevios);
+                blocks.erase(blocks.begin() + i, blocks.begin() + iPrevios);
+                uint32_t delta = iPrevios - i;
+
+                for (uint32_t n : instruction) {
+                    if (n > i)
+                        new_instruction.push_back(n - delta);
+                    else
+                        new_instruction.push_back(n);
+                }
+
+                instruction = new_instruction;
+                new_instruction.clear();
+            }                
+        } while (++i < blocksRange.size());
+    }
+
+    void WorkflowParser::deleteTwins() {
+        if (blocks.size() > 1) {
+            std::list<uint32_t> new_intruction;
+            blocksRange.assign(blocksRange.size(), false);
+            for (uint32_t n : instruction) {
+                for (uint32_t i = 0; i < blocks.size(); ++i)
+                    if (blocks[i] == blocks[n]) {
+                        n = i;
+                        break;
+                    }
+                blocksRange[n] = true;
+                new_intruction.push_back(n);
+            }
+            instruction = new_intruction;
+        }
+    }
+
+    void WorkflowParser::deleteNoUsedBlocks() {
+        uint32_t i = 0;
+        do {
+            if (!blocksRange[i]) {
+                blocks.erase(blocks.begin() + i);
+                blocksRange.erase(blocksRange.begin() + i);
+                if(i > 0)
+                    --i;
+            }
+        } while (++i < blocksRange.size());
+        blocksRange.clear();
     }
 
     void WorkflowParser::getFromFile(const std::string& filename) {
@@ -122,7 +192,7 @@ namespace wkfw{
 
             while((!input.eof()) && (line.find("csed", 0, 1))){
                 if(!getBlock(line))
-                    throw("no _split_ in the cmd string block, or source line is empty");
+                    throw("invalid block string");
                 getline(input, line);
             }
 
@@ -136,6 +206,12 @@ namespace wkfw{
 
             if (!getInstruction(line))
                 throw("bad char in the source file, when instruction reading");
+
+            dataOptimize();
+
+            deleteTwins();
+
+            deleteNoUsedBlocks();
 
             input.close();
         } catch(std::istream::failure& e){
